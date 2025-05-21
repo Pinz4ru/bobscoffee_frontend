@@ -1,14 +1,20 @@
 import 'dart:convert';
+import '../../models/user_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final Future<void> Function(User) onLogin;
+
+  const RegisterScreen({super.key, required this.onLogin});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
+
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
@@ -57,7 +63,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => LoginScreen(onLogin: widget.onLogin)),
       );
     } else {
       final json = jsonDecode(response.body);
@@ -70,6 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _errorMessage = 'Something went wrong. Please try again.';
     });
   } finally {
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
@@ -79,6 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -94,8 +102,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 120,
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Register",
+                  Text(
+                    loc.register,
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -106,41 +114,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      labelText: 'Username',
+                      labelText: loc.username,
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.red),
                       ),
                     ),
                     validator: (value) =>
-                        value == null || value.isEmpty ? 'Enter username' : null,
+                        value == null || value.isEmpty ? loc.enterUsername : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: loc.email,
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.red),
                       ),
                     ),
                     validator: (value) =>
-                        value == null || !value.contains('@') ? 'Enter valid email' : null,
+                        value == null || !value.contains('@') ? loc.enterValidEmail : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: loc.password,
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.red),
                       ),
                     ),
                     validator: (value) =>
-                        value == null || value.length < 6 ? 'Min 6 characters' : null,
+                        value == null || value.length < 6 ? loc.min6Characters : null,
                   ),
                   const SizedBox(height: 24),
                   if (_errorMessage != null)
@@ -160,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Register'),
+                          : Text(loc.register),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -168,11 +176,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        MaterialPageRoute(builder: (_) => LoginScreen(onLogin: widget.onLogin)),
                       );
                     },
-                    child: const Text(
-                      'Back to Login',
+                    child:  Text(
+                      loc.backToLogin,
                       style: TextStyle(color: Colors.red),
                     ),
                   ),

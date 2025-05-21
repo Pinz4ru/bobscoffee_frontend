@@ -1,23 +1,26 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'register_screen.dart';
 import '../../models/user_model.dart';
-import '../user/loyalty_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  
+  final Future<void> Function(User user) onLogin;
+  const LoginScreen({Key? key, required this.onLogin}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  String? _errorMessage;
+  
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -47,34 +50,31 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final user = User.fromJson(json);
-
-        if (!mounted) return;
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => LoyaltyScreen(user: user),
-          ),
-        );
+        await widget.onLogin(user);
       } else {
         final error = jsonDecode(response.body);
         setState(() {
-          _errorMessage = error['message'] ?? 'Login failed.';
+          _errorMessage = error['message'] ?? AppLocalizations.of(context)!.loginFailed;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Something went wrong. Please try again.';
+        _errorMessage = AppLocalizations.of(context)!.somethingWentWrong;
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -92,41 +92,33 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 300,
               fit: BoxFit.contain,
             ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Bob's Coffee",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
+                  
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      labelText: 'Username',
+                      labelText:  loc.username,
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.red),
                       ),
                     ),
                     validator: (value) =>
-                        value == null || value.isEmpty ? 'Enter username' : null,
+                       value == null || value.isEmpty ? loc.enterUsername : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: loc.password,
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.red),
                       ),
                     ),
                     validator: (value) =>
-                        value == null || value.isEmpty ? 'Enter password' : null,
+                        value == null || value.isEmpty ? loc.enterPassword : null,
                   ),
                   const SizedBox(height: 24),
                   if (_errorMessage != null)
@@ -146,15 +138,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          :const Text(
-                    "Login",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                          : Text(
+                              loc.login,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
+                    
                   ),
-                    ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => RegisterScreen(onLogin: widget.onLogin),),
+                      );
+                    },
+                  child: Text(loc.dontHaveAccountRegister),
                   ),
                 ],
               ),

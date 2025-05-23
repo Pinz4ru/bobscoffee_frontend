@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'dart:convert';
 import '../../models/user_model.dart';
 import 'package:flutter/material.dart';
@@ -14,14 +16,14 @@ class BaristaScreen extends StatefulWidget {
   final ValueChanged<String> onChangeLanguage;
 
   const BaristaScreen({
-    Key? key,
+    super.key,
     required this.user,
     required this.onLogout,
     required this.isDarkMode,
     required this.onToggleDarkMode,
     required this.locale,
     required this.onChangeLanguage,
-  }) : super(key: key);
+  });
 
   @override
   _BaristaScreenState createState() => _BaristaScreenState();
@@ -88,18 +90,34 @@ class _BaristaScreenState extends State<BaristaScreen> {
           foregroundColor: Colors.white,
         actions: [
           Row(
-      children: [
-        const Icon(Icons.light_mode, color: Colors.white),
-        Switch(
-          value: widget.isDarkMode,
-          onChanged: widget.onToggleDarkMode,
-          activeColor: Colors.white,
-          inactiveThumbColor: Colors.grey[300],
-          inactiveTrackColor: Colors.grey[600],
-        ),
-        const Icon(Icons.dark_mode, color: Colors.white),
-      ],
-    ),
+            children: [
+              const Icon(Icons.light_mode, color: Colors.white),
+              Switch(
+                value: widget.isDarkMode,
+                onChanged: widget.onToggleDarkMode,
+                activeColor: Colors.white,
+                inactiveThumbColor: Colors.grey[300],
+                inactiveTrackColor: Colors.grey[600],
+              ),
+              const Icon(Icons.dark_mode, color: Colors.white),
+              const SizedBox(width: 8),
+              DropdownButton<String>(
+                dropdownColor: Colors.white,
+                value: widget.locale.languageCode,
+                icon: const Icon(Icons.language, color: Colors.white),
+                underline: const SizedBox(),
+                style: const TextStyle(color: Colors.black),
+                onChanged: (value) {
+                  if (value != null) widget.onChangeLanguage(value);
+                },
+                items: const [
+                  DropdownMenuItem(value: 'en', child: Text('EN')),
+                  DropdownMenuItem(value: 'ro', child: Text('RO')),
+                  DropdownMenuItem(value: 'ru', child: Text('RU')),
+                ],
+              ),
+            ],
+          ),
         IconButton(onPressed: widget.onLogout, icon: const Icon(Icons.logout)),
         ],
       ),

@@ -59,7 +59,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      // Registration successful, redirect to login
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -76,6 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _errorMessage = 'Something went wrong. Please try again.';
     });
   } finally {
+    // ignore: control_flow_in_finally
     if (!mounted) return;
     setState(() {
       _isLoading = false;
@@ -99,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Image.asset(
                     'assets/images/logo.png',
-                    height: 120,
+                    height: 300,
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -174,10 +174,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginScreen(onLogin: widget.onLogin)),
-                      );
+                      Navigator.pop(context);
+
                     },
                     child:  Text(
                       loc.backToLogin,

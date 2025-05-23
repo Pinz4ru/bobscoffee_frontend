@@ -8,7 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class LoginScreen extends StatefulWidget {
   
   final Future<void> Function(User user) onLogin;
-  const LoginScreen({Key? key, required this.onLogin}) : super(key: key);
+  const LoginScreen({super.key, required this.onLogin});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -95,30 +95,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   
                   const SizedBox(height: 32),
                   TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText:  loc.username,
-                      border: const OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
-                    ),
-                    validator: (value) =>
-                       value == null || value.isEmpty ? loc.enterUsername : null,
+  controller: _usernameController,
+  style: const TextStyle(color: Colors.black), // 👈 Text color
+  decoration: InputDecoration(
+    labelText: loc.username,
+    labelStyle: const TextStyle(color: Colors.red), // 👈 Label color (optional)
+    border: const OutlineInputBorder(),
+    focusedBorder: const OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.red),
+    ),
+  ),
+  validator: (value) =>
+                    value == null || value.isEmpty ? loc.enterUsername : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
+                   controller: _passwordController,
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.black), // 👈 Text color
                     decoration: InputDecoration(
-                      labelText: loc.password,
-                      border: const OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
+                    labelText: loc.password,
+                    labelStyle: const TextStyle(color: Colors.red), // 👈 Label color (optional)
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
                     ),
-                    validator: (value) =>
-                        value == null || value.isEmpty ? loc.enterPassword : null,
+                  ),
+                  validator: (value) =>
+                    value == null || value.isEmpty ? loc.enterPassword : null,
                   ),
                   const SizedBox(height: 24),
                   if (_errorMessage != null)
@@ -150,14 +154,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => RegisterScreen(onLogin: widget.onLogin),),
-                      );
-                    },
-                  child: Text(loc.dontHaveAccountRegister),
-                  ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RegisterScreen(onLogin: widget.onLogin),
+      ),
+    );
+  },
+  child: Text(loc.dontHaveAccountRegister),
+),
+
                 ],
               ),
             ),

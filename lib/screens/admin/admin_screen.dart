@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'dart:convert';
 import '../../models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,14 +17,14 @@ class AdminScreen extends StatefulWidget {
   final ValueChanged<String> onChangeLanguage;
   
   const AdminScreen({
-    Key? key,
+    super.key,
     required this.user,
     required this.onLogout,
     required this.isDarkMode,
     required this.onToggleDarkMode,
     required this.locale,
     required this.onChangeLanguage,
-  }) : super(key: key);
+  });
   @override
   State<AdminScreen> createState() => _AdminScreenState();
 }
@@ -115,6 +117,8 @@ Future<void> logout() async {
 
   void showCreateUserDialog() {
     final loc = AppLocalizations.of(context)!;
+    // ignore: duplicate_ignore
+    // ignore: no_leading_underscores_for_local_identifiers
     final _username = TextEditingController();
     final _email = TextEditingController();
     final _password = TextEditingController();
@@ -220,6 +224,22 @@ Future<void> logout() async {
           inactiveTrackColor: Colors.grey[600],
         ),
         const Icon(Icons.dark_mode, color: Colors.white),
+        const SizedBox(width: 8),
+        DropdownButton<String>(
+          dropdownColor: Colors.white,
+          value: widget.locale.languageCode,
+          icon: const Icon(Icons.language, color: Colors.white),
+          underline: const SizedBox(),
+          style: const TextStyle(color: Colors.black),
+          onChanged: (value) {
+            if (value != null) widget.onChangeLanguage(value);
+          },
+          items: const [
+            DropdownMenuItem(value: 'en', child: Text('EN')),
+            DropdownMenuItem(value: 'ro', child: Text('RO')),
+            DropdownMenuItem(value: 'ru', child: Text('RU')),
+          ],
+        ),
       ],
     ),
 
@@ -238,23 +258,34 @@ Future<void> logout() async {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          OutlinedButton(
-                            onPressed: showCreateUserDialog,
-                            child:  Text(loc.createUserButton, style: TextStyle(color: Colors.red)),
+                      SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: OutlinedButton(
+                          onPressed: showCreateUserDialog,
+                          child: Text(loc.createUserButton, style: const TextStyle(color: Colors.red)),
                           ),
-                          OutlinedButton(
-                            onPressed: fetchLoyaltyCards,
-                            child: Text(loc.showAllUsersButton, style: TextStyle(color: Colors.red)),
+                        ),
+                        Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: OutlinedButton(
+                          onPressed: fetchLoyaltyCards,
+                        child: Text(loc.showAllUsersButton, style: const TextStyle(color: Colors.red)),
+                        ),
+                        ),
+                        Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: OutlinedButton(
+                          onPressed: scanAndAddCoffee,
+                          child: Text(loc.scanQRButton, style: const TextStyle(color: Colors.red)),
                           ),
-                          OutlinedButton(
-                            onPressed: scanAndAddCoffee,
-                            child: Text(loc.scanQRButton, style: TextStyle(color: Colors.red)),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                  ),
                       const SizedBox(height: 16),
                       Text(loc.allUsersTitle, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
@@ -265,9 +296,9 @@ Future<void> logout() async {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(loc.usernameLabel(user.username), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Text(loc.usernameLabel(user['username']), style: const TextStyle(fontWeight: FontWeight.bold)),
                                 Text("Email: ${user['email']}"),
-                                Text(loc.coffeeRoleInfo(user.coffeeCount, user.roles)),
+                                Text(loc.coffeeRoleInfo(user['coffeeCount'], user['roles'])),
                                 const SizedBox(height: 8),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -340,21 +371,26 @@ class QRScanPage extends StatefulWidget {
 }
 
 class _QRScanPageState extends State<QRScanPage> {
-  String? scannedData;
+  bool _scanning = false;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title:  Text(loc.scanQRTitle), backgroundColor: Colors.red),
+      appBar: AppBar(title: Text(loc.scanQRTitle), backgroundColor: Colors.red),
       body: MobileScanner(
         onDetect: (capture) {
+          if (_scanning) return;
           final barcode = capture.barcodes.first;
-          if (barcode.rawValue != null && mounted) {
-            Navigator.pop(context, barcode.rawValue);
+          final rawValue = barcode.rawValue;
+          if (rawValue != null && mounted) {
+            _scanning = true;
+            Navigator.pop(context, rawValue);
           }
         },
       ),
     );
   }
 }
+
+

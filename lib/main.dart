@@ -41,11 +41,11 @@ class MyApp extends StatefulWidget {
   final String initialLangCode;
 
   const MyApp({
-    Key? key,
+    super.key,
     this.initialUser,
     required this.initialDarkMode,
     required this.initialLangCode,
-  }) : super(key: key);
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -102,8 +102,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildHomeScreen() {
-    final loc = AppLocalizations.of(context)!;
     if (user == null) return LoginScreen(onLogin: login);
+    
 
     if (user!.roles.contains('Admin')) {
       return AdminScreen(
@@ -135,13 +135,13 @@ class _MyAppState extends State<MyApp> {
     } else {
       return Scaffold(
         
-        appBar: AppBar(title:  Text(loc.unknownRoleMessage)),
+        appBar: AppBar(title: Text('Unknown Role')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(loc.unknownRoleMessage),
-              ElevatedButton(onPressed: logout, child: Text(loc.logout)),
+              Text('Unknown Role'),
+              ElevatedButton(onPressed: logout, child: Text('Logout')),
             ],
           ),
         ),
@@ -154,7 +154,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: "Bob's Coffee",
       locale: locale,
-      supportedLocales: const [Locale('en'), Locale('ru'), Locale('ro')],
+      supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
     AppLocalizations.delegate,                  // your generated localizations
     GlobalMaterialLocalizations.delegate,
